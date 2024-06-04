@@ -19,6 +19,7 @@ class Platformer extends Phaser.Scene {
         this.playerStates.inWater = false;
         this.playerStates.stepSounds = false;
         this.flagCount = 0;
+        this.SCALE = 2;
     }
 
     create() {

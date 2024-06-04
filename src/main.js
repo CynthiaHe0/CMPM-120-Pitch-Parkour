@@ -12,9 +12,10 @@
 "use strict"
 
 // game config
+// Using Phaser.Auto instead of Phaser.Canvas so I can tint color particles
 let config = {
     parent: 'phaser-game',
-    type: Phaser.CANVAS,
+    type: Phaser.AUTO,
     render: {
         pixelArt: true  // prevent pixel art from getting blurred when scaled
     },
@@ -30,7 +31,7 @@ let config = {
     },
     width: 1440,
     height: 720,
-    scene: [Load, Platformer]
+    scene: [Load, Platformer, MainMenu, Credits]
 }
 
 var cursors;
