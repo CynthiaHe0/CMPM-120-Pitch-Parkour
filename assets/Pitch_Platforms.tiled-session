@@ -44,6 +44,7 @@
     "openFiles": [
     ],
     "project": "Pitch_Platforms.tiled-project",
+    "property.type": "bool",
     "recentFiles": [
         "Level1.tmj",
         "rainbow_notes.tsx",

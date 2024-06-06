@@ -39,6 +39,9 @@ class Platformer extends Phaser.Scene {
         this.kennyTileset = this.map.addTilesetImage("tilemap_packed", "tilemap_tiles");
         
         this.groundLayer = this.map.createLayer("Platforms", [this.rainbowNotes, this.kennyTileset], 0, 0);
+        this.groundLayer.setCollisionByProperty({
+            collides: true
+        });
         this.groundLayer.setScale(SCALE);
 
         // Enable collision handling
