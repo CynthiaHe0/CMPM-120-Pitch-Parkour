@@ -28,13 +28,18 @@ class Platformer extends Phaser.Scene {
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(this.spawnX, this.spawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
         my.sprite.player.body.setSize(15, 15);
-        my.sprite.player.setCollideWorldBounds(true);
+        //my.sprite.player.setCollideWorldBounds(true);
         my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
-        this.playerStepSound = this.sound.add("default step");
-        this.playerJumpSound = this.sound.add("jump");
-        this.playerSplashSound = this.sound.add("splash");
-        this.playerBubbleSound = this.sound.add("bubbles");
-        this.checkPointSound = this.sound.add("yay");
+        
+        this.map = this.add.tilemap("Level1", 18, 18, 120, 25);
+        
+        //First parameter is the name we gave it in tiled
+        //Second parameter is the name we gave it in load.js
+        this.rainbowNotes = this.map.addTilesetImage("rainbow_notes", "rainbowNotes");
+        this.kennyTileset = this.map.addTilesetImage("tilemap_packed", "tilemap_tiles");
+        
+        this.groundLayer = this.map.createLayer("Platforms", [this.rainbowNotes, this.kennyTileset], 0, 0);
+        this.groundLayer.setScale(SCALE);
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
