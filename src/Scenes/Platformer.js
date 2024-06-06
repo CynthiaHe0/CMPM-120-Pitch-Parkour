@@ -16,9 +16,11 @@ class Platformer extends Phaser.Scene {
         this.score = 0;
         this.spawnX = game.config.width/5;
         this.spawnY = 5*game.config.height/6;
-        this.playerStates = {};
-        this.playerStates.inWater = false;
-        this.playerStates.stepSounds = false;
+        this.playerStates = {
+            onGround : false,
+            platform1 : null,
+            platform2 : null,
+        };
         this.flagCount = 0;
         this.SCALE = 2;
     }
@@ -58,7 +60,15 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.setCollideWorldBounds(true);
         my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
         // Enable collision handling
-        this.physics.add.collider(my.sprite.player, this.groundLayer);
+        this.physics.add.collider(my.sprite.player, this.groundLayer, (player, tile)=>{
+            if (tile != this.playerStates.platform1){
+                if (this.playerStates.platform2 != null){
+                    this.playerStates.platform2.collideUp = true;
+                }
+                this.playerStates.platform2 = this.playerStates.platform1;
+                this.playerStates.platform1 = tile;
+            }
+        });
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -126,10 +136,27 @@ class Platformer extends Phaser.Scene {
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
                 //PLAY JUMP SOUND EFFECT
             }
+            if (Phaser.Input.Keyboard.JustDown(cursors.down)){
+                console.log(this.playerStates.platform1);
+                console.log(this.playerStates.platform2);
+                if (this.playerStates.platform1.note != "rest" && this.playerStates.platform2.note != "rest"){
+                    this.playerStates.platform1.collideUp = false;
+                    this.playerStates.platform2.collideUp = false;
+                }
+            }
         }
         
     }
-    
+    /*isOnPlatform(player, tile){
+        console.log(player);
+        console.log(tile);
+        console.log(this.playerStates);
+        if (this.playerStates.platform != null){
+            this.playerStates.platform.collideUp = true;
+        }
+        this.playerStates.platform = tile;
+        console.log(platform);
+    }*/
     respawn(){
         //this.physics.world.gravity.y = 1500;
         my.sprite.player.x = this.spawnX;
