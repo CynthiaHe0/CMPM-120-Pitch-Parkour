@@ -7,8 +7,9 @@ class Platformer extends Phaser.Scene {
     }
     init() {
         // variables and settings
-        this.ACCELERATION = 400;
-        this.DRAG = 1800;    // DRAG < ACCELERATION = icy slide
+        //If you have extra time, make it so you can instantly turn
+        this.ACCELERATION = 800;
+        this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.JUMP_VELOCITY = -700;
         this.MAX_SPEED = 800;
@@ -23,14 +24,7 @@ class Platformer extends Phaser.Scene {
     }
 
     create() {
-
-
-        // set up player avatar
-        my.sprite.player = this.physics.add.sprite(this.spawnX, this.spawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
-        my.sprite.player.body.setSize(15, 15);
-        //my.sprite.player.setCollideWorldBounds(true);
-        my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
-        
+        //Set up level       
         this.map = this.add.tilemap("Level1", 18, 18, 120, 25);
         
         //First parameter is the name we gave it in tiled
@@ -43,7 +37,26 @@ class Platformer extends Phaser.Scene {
             collides: true
         });
         this.groundLayer.setScale(SCALE);
+        let fall_through = this.groundLayer.filterTiles((tile) => {
+            if (tile.collides == true){
+                return true;
+            }
+            return false;
+        });
 
+        for (let tile of fall_through){
+            tile.collideDown = false;
+        }
+
+        //Scale up the world boundaries because we zoomed into the size of the objects
+        this.physics.world.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2);
+
+
+        // set up player avatar
+        my.sprite.player = this.physics.add.sprite(this.spawnX, this.spawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
+        my.sprite.player.body.setSize(15, 15);
+        my.sprite.player.setCollideWorldBounds(true);
+        my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
@@ -76,12 +89,14 @@ class Platformer extends Phaser.Scene {
         //If visible, play animation
         if(cursors.left.isDown) {
             // TODO: have the player accelerate to the left
+            //my.sprite.player.body.setVelocityX(-400);
             my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
 
         } else if(cursors.right.isDown) {
             // TODO: have the player accelerate to the right
+            //my.sprite.player.body.setVelocityX(400);
             my.sprite.player.body.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);

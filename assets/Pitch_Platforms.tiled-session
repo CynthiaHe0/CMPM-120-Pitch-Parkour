@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "Level1.tmj",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -15,7 +15,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 237.33333333333331,
+                "x": 235.33333333333331,
                 "y": 256.33333333333337
             }
         },
@@ -42,6 +42,7 @@
     "map.tileWidth": 18,
     "map.width": 120,
     "openFiles": [
+        "Level1.tmj"
     ],
     "project": "Pitch_Platforms.tiled-project",
     "property.type": "bool",
