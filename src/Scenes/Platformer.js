@@ -18,8 +18,7 @@ class Platformer extends Phaser.Scene {
         this.spawnY = 5*game.config.height/6;
         this.playerStates = {
             onGround : false,
-            platform1 : null,
-            platform2 : null,
+            platform : null
         };
         this.flagCount = 0;
         this.SCALE = 2;
@@ -61,13 +60,11 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer, (player, tile)=>{
-            if (tile != this.playerStates.platform1){
-                if (this.playerStates.platform2 != null){
-                    this.playerStates.platform2.collideUp = true;
-                }
-                this.playerStates.platform2 = this.playerStates.platform1;
-                this.playerStates.platform1 = tile;
+            //This if statement resets the collision for the tiles
+            if (this.playerStates.platform != null){
+                this.resetCollision();
             }
+            this.playerStates.platform = tile;
         });
 
         // set up Phaser-provided cursor key input
@@ -137,28 +134,38 @@ class Platformer extends Phaser.Scene {
                 //PLAY JUMP SOUND EFFECT
             }
             if (Phaser.Input.Keyboard.JustDown(cursors.down)){
-                console.log(this.playerStates.platform1);
-                console.log(this.playerStates.platform2);
-                if (this.playerStates.platform1.note != "rest" && this.playerStates.platform2.note != "rest"){
-                    this.playerStates.platform1.collideUp = false;
-                    this.playerStates.platform2.collideUp = false;
+                console.log(this.playerStates.platform);
+                if (this.playerStates.platform.note != "rest"){
+                    this.playerStates.platform.collideUp = false;
+                    //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
+                    let sameTiles = this.groundLayer.filterTiles((tile) => {
+                        if (tile.index == this.playerStates.platform.index){
+                            return true;
+                        }
+                        return false;
+                    });
+                    for (let tile of sameTiles){
+                        tile.collideUp = false;
+                    }
                 }
             }
         }
         
     }
-    /*isOnPlatform(player, tile){
-        console.log(player);
-        console.log(tile);
-        console.log(this.playerStates);
-        if (this.playerStates.platform != null){
-            this.playerStates.platform.collideUp = true;
+    resetCollision(){
+        let sameTiles = this.groundLayer.filterTiles((tile) => {
+            if (tile.index == this.playerStates.platform.index){
+                return true;
+            }
+            return false;
+        });
+        for (let tile of sameTiles){
+            tile.collideUp = true;
         }
-        this.playerStates.platform = tile;
-        console.log(platform);
-    }*/
+    }
     respawn(){
         //this.physics.world.gravity.y = 1500;
+        this.resetCollision();
         my.sprite.player.x = this.spawnX;
         my.sprite.player.y = this.spawnY;
     }
