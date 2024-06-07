@@ -15,6 +15,14 @@ class Load extends Phaser.Scene {
         this.load.image("rainbowNotes", "tile_sheet_128px_by_128px.png");
         this.load.image("tilemap_tiles", "tilemap_packed.png");                         // Packed tilemap
        
+        this.load.audio("do", ["do.ogg"]);
+        this.load.audio("re", ["re.ogg"]);
+        this.load.audio("mi", ["mi.ogg"]);
+        this.load.audio("fa", ["fa.ogg"]);
+        this.load.audio("so", ["so.ogg"]);
+        this.load.audio("la", ["la.ogg"]);
+        this.load.audio("ti", ["ti.ogg"]);
+        this.load.audio("high do", ["high_do.ogg"]);
 
     }
 

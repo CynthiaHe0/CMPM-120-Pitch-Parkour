@@ -18,7 +18,8 @@ class Platformer extends Phaser.Scene {
         this.spawnY = 5*game.config.height/6;
         this.playerStates = {
             onGround : false,
-            platform : null
+            platform : null,
+            stepSounds: false,
         };
         this.flagCount = 0;
         this.SCALE = 2;
@@ -58,12 +59,24 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.body.setSize(15, 15);
         my.sprite.player.setCollideWorldBounds(true);
         my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
+        this.cMajor = {};
+        this.cMajor.do = this.sound.add("do");
+        this.cMajor.re = this.sound.add("re");
+        this.cMajor.mi = this.sound.add("mi");
+        this.cMajor.fa = this.sound.add("fa");
+        this.cMajor.so = this.sound.add("so");
+        this.cMajor.la = this.sound.add("la");
+        this.cMajor.ti = this.sound.add("ti");
+        this.cMajor.high_do = this.sound.add("high do");
+
+
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer, (player, tile)=>{
             //This if statement resets the collision for the tiles
             if (this.playerStates.platform != null){
                 this.resetCollision();
             }
+            //This is for detecting what platform the player is on and eventually lets them fall through
             this.playerStates.platform = tile;
         });
 
@@ -121,13 +134,13 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.anims.play('jump');
         }
         if(my.sprite.player.body.blocked.down) {
-            if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0)){
+            if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0) && this.playerStates.platform.properties.note != "rest"){
                 //PLAY ASSOCIATED NOTE
-                /*this.playerStates.stepSounds = true;
-                this.playerStepSound.play();
-                this.playerStepSound.on('complete', () => {
+                this.playerStates.stepSounds = true;
+                this.cMajor[this.playerStates.platform.properties.note].play();
+                this.cMajor[this.playerStates.platform.properties.note].on('complete', () => {
                     this.playerStates.stepSounds = false;
-                });*/
+                });
             }
             if(Phaser.Input.Keyboard.JustDown(cursors.up)){
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
@@ -135,9 +148,11 @@ class Platformer extends Phaser.Scene {
             }
             if (Phaser.Input.Keyboard.JustDown(cursors.down)){
                 console.log(this.playerStates.platform);
-                if (this.playerStates.platform.note != "rest"){
+                if (this.playerStates.platform.properties.note != "rest"){
                     this.playerStates.platform.collideUp = false;
                     //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
+                    //I am kinda cheating with my design because since it's based around notes, I made sure all the same notes
+                    //are at the same height
                     let sameTiles = this.groundLayer.filterTiles((tile) => {
                         if (tile.index == this.playerStates.platform.index){
                             return true;
