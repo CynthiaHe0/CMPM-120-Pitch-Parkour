@@ -11,7 +11,7 @@ class Platformer extends Phaser.Scene {
         this.ACCELERATION = 800;
         this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -0.1;
+        this.BASE_JUMP_VELOCITY = -100;
         this.MAX_SPEED = 800;
         this.score = 0;
         this.spawnX = game.config.width/10;
@@ -151,6 +151,7 @@ class Platformer extends Phaser.Scene {
                 this.playerStates.jumping = true;
                 this.jumpTimer.reset({ delay: 250, callback: this.onJump, callbackScope: this });
                 this.time.addEvent(this.jumpTimer);
+                this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
                 //PLAY JUMP SOUND EFFECT
             }
             if (Phaser.Input.Keyboard.JustDown(cursors.down)){
@@ -174,12 +175,12 @@ class Platformer extends Phaser.Scene {
         }
         if (this.playerStates.jumping == true){
             if (cursors.up.isDown){
-                this.JUMP_VELOCITY += this.JUMP_VELOCITY;
+                this.JUMP_VELOCITY -= 20 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             } else {
+                //This is in case the player wants to do a short jump;
                 this.playerStates.jumping = false;
-                this.JUMP_VELOCITY = -0.1;
-                console.log(my.sprite.player.body);
+                this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
             }
         }
     }
@@ -201,6 +202,8 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.y = this.spawnY;
     }
     onJump(){
+        console.log("on Jump called!");
         this.playerStates.jumping = false;
+        this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
     }
 }
