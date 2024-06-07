@@ -14,7 +14,7 @@ class Platformer extends Phaser.Scene {
         this.JUMP_VELOCITY = -700;
         this.MAX_SPEED = 800;
         this.score = 0;
-        this.spawnX = game.config.width/5;
+        this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
         this.playerStates = {
             onGround : false,
@@ -51,7 +51,7 @@ class Platformer extends Phaser.Scene {
         }
 
         //Scale up the world boundaries because we zoomed into the size of the objects
-        this.physics.world.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2);
+        this.physics.world.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2 + 40);
 
 
         // set up player avatar
@@ -107,6 +107,10 @@ class Platformer extends Phaser.Scene {
     update() {
         //check if coin object is visible
         //If visible, play animation
+        if (my.sprite.player.y >= this.map.heightInPixels*2){
+            //Play funny death thingy
+            this.respawn();
+        }
         if(cursors.left.isDown) {
             // TODO: have the player accelerate to the left
             //my.sprite.player.body.setVelocityX(-400);
