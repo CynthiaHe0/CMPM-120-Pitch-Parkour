@@ -11,7 +11,7 @@ class Platformer extends Phaser.Scene {
         this.ACCELERATION = 800;
         this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -700;
+        this.JUMP_VELOCITY = -0.1;
         this.MAX_SPEED = 800;
         this.score = 0;
         this.spawnX = game.config.width/10;
@@ -20,6 +20,7 @@ class Platformer extends Phaser.Scene {
             onGround : false,
             platform : null,
             stepSounds: false,
+            jumping: false,
         };
         this.flagCount = 0;
         this.SCALE = 2;
@@ -79,6 +80,8 @@ class Platformer extends Phaser.Scene {
             //This is for detecting what platform the player is on and eventually lets them fall through
             this.playerStates.platform = tile;
         });
+        this.jumpTimer = this.time.addEvent({ delay: 2000, callback: this.onJump, callbackScope: this });
+
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -101,7 +104,6 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
-
     }
 
     update() {
@@ -136,8 +138,7 @@ class Platformer extends Phaser.Scene {
         // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
         if(!my.sprite.player.body.blocked.down) {
             my.sprite.player.anims.play('jump');
-        }
-        if(my.sprite.player.body.blocked.down) {
+        } else {
             if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0) && this.playerStates.platform.properties.note != "rest"){
                 //PLAY ASSOCIATED NOTE
                 this.playerStates.stepSounds = true;
@@ -147,7 +148,9 @@ class Platformer extends Phaser.Scene {
                 });
             }
             if(Phaser.Input.Keyboard.JustDown(cursors.up)){
-                my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+                this.playerStates.jumping = true;
+                this.jumpTimer.reset({ delay: 250, callback: this.onJump, callbackScope: this });
+                this.time.addEvent(this.jumpTimer);
                 //PLAY JUMP SOUND EFFECT
             }
             if (Phaser.Input.Keyboard.JustDown(cursors.down)){
@@ -169,7 +172,16 @@ class Platformer extends Phaser.Scene {
                 }
             }
         }
-        
+        if (this.playerStates.jumping == true){
+            if (cursors.up.isDown){
+                this.JUMP_VELOCITY += this.JUMP_VELOCITY;
+                my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+            } else {
+                this.playerStates.jumping = false;
+                this.JUMP_VELOCITY = -0.1;
+                console.log(my.sprite.player.body);
+            }
+        }
     }
     resetCollision(){
         let sameTiles = this.groundLayer.filterTiles((tile) => {
@@ -188,5 +200,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.x = this.spawnX;
         my.sprite.player.y = this.spawnY;
     }
-    
+    onJump(){
+        this.playerStates.jumping = false;
+    }
 }
