@@ -104,9 +104,12 @@ class Platformer extends Phaser.Scene {
         });
         this.physics.add.overlap(my.sprite.player, this.flags, (player, tile) => {
             if (tile.index == 112 || tile.index == 132){
-                this.spawnX = tile.x * 36;
-                this.spawnY = 36 * (tile.index == 112 ? tile.y : tile.y-1);
-            } else if (tile.index == 10){
+                if (tile.x * 36 > this.spawnX){
+                    this.spawnX = tile.x * 36;
+                    this.spawnY = 36 * (tile.index == 112 ? tile.y : tile.y-1);
+                    //Play checkpoint sound
+                }
+            } else if (tile.index == 11){
                 console.log("Onto the next area!");
             }
         });
