@@ -23,6 +23,7 @@ class Load extends Phaser.Scene {
         this.load.audio("la", ["la.ogg"]);
         this.load.audio("ti", ["ti.ogg"]);
         this.load.audio("high do", ["high_do.ogg"]);
+        this.load.audio("rest", ["footstep_carpet_000.ogg"]);
 
     }
 

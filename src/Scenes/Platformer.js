@@ -12,7 +12,7 @@ class Platformer extends Phaser.Scene {
         this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.BASE_JUMP_VELOCITY = -100;
-        this.MAX_SPEED = 800;
+        this.MAX_SPEED = 500;
         this.score = 0;
         this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
@@ -21,9 +21,10 @@ class Platformer extends Phaser.Scene {
             platform : null,
             stepSounds: false,
             jumping: false,
+            falling: false,
         };
         this.flagCount = 0;
-        this.SCALE = 2;
+        this.SCALE = 1.5;
     }
 
     create() {
@@ -48,8 +49,28 @@ class Platformer extends Phaser.Scene {
         });
 
         for (let tile of fall_through){
-            tile.collideDown = false;
+            if (tile.properties.note != "rest"){
+                tile.collideLeft = false;
+                tile.collideRight = false;
+                tile.collideDown = false;
+            }
         }
+
+        //Set up checkpoints
+        this.flags = this.map.createLayer("Flags", this.kennyTileset, 0, 0);
+        this.flags.setScale(SCALE);
+        /*let checkpoints = this.flags.filterTiles((tile) =>{
+            if (tile.index != -1){
+                return true;
+            }
+            return false;
+        });
+        console.log(this.flags);
+        console.log(checkpoints);*/
+        this.flags.setCollisionByProperty({
+            collides : true
+        });
+
 
         //Scale up the world boundaries because we zoomed into the size of the objects
         this.physics.world.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2 + 40);
@@ -60,15 +81,16 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.body.setSize(15, 15);
         my.sprite.player.setCollideWorldBounds(true);
         my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
-        this.cMajor = {};
-        this.cMajor.do = this.sound.add("do");
-        this.cMajor.re = this.sound.add("re");
-        this.cMajor.mi = this.sound.add("mi");
-        this.cMajor.fa = this.sound.add("fa");
-        this.cMajor.so = this.sound.add("so");
-        this.cMajor.la = this.sound.add("la");
-        this.cMajor.ti = this.sound.add("ti");
-        this.cMajor.high_do = this.sound.add("high do");
+        this.noteSounds = {};
+        this.noteSounds.do = this.sound.add("do");
+        this.noteSounds.re = this.sound.add("re");
+        this.noteSounds.mi = this.sound.add("mi");
+        this.noteSounds.fa = this.sound.add("fa");
+        this.noteSounds.so = this.sound.add("so");
+        this.noteSounds.la = this.sound.add("la");
+        this.noteSounds.ti = this.sound.add("ti");
+        this.noteSounds.high_do = this.sound.add("high do");
+        this.noteSounds.rest = this.sound.add("rest");
 
 
         // Enable collision handling
@@ -80,7 +102,15 @@ class Platformer extends Phaser.Scene {
             //This is for detecting what platform the player is on and eventually lets them fall through
             this.playerStates.platform = tile;
         });
-        this.jumpTimer = this.time.addEvent({ delay: 2000, callback: this.onJump, callbackScope: this });
+        this.physics.add.overlap(my.sprite.player, this.flags, (player, tile) => {
+            if (tile.index == 112 || tile.index == 132){
+                this.spawnX = tile.x * 36;
+                this.spawnY = 36 * (tile.index == 112 ? tile.y : tile.y-1);
+            } else if (tile.index == 10){
+                console.log("Onto the next area!");
+            }
+        });
+        this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
 
 
         // set up Phaser-provided cursor key input
@@ -95,7 +125,7 @@ class Platformer extends Phaser.Scene {
 
         
         //PUT THE INIT AFTER ALL LAYERS CREATED
-        this.animatedTiles.init(this.map);
+        //this.animatedTiles.init(this.map);
 
         
 
@@ -107,8 +137,7 @@ class Platformer extends Phaser.Scene {
     }
 
     update() {
-        //check if coin object is visible
-        //If visible, play animation
+        //Check if the player fell off the map
         if (my.sprite.player.y >= this.map.heightInPixels*2){
             //Play funny death thingy
             this.respawn();
@@ -139,23 +168,24 @@ class Platformer extends Phaser.Scene {
         if(!my.sprite.player.body.blocked.down) {
             my.sprite.player.anims.play('jump');
         } else {
-            if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0) && this.playerStates.platform.properties.note != "rest"){
+            //This is for the walking sounds
+            if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0)){
                 //PLAY ASSOCIATED NOTE
-                this.playerStates.stepSounds = true;
-                this.cMajor[this.playerStates.platform.properties.note].play();
-                this.cMajor[this.playerStates.platform.properties.note].on('complete', () => {
-                    this.playerStates.stepSounds = false;
-                });
+                this.playNote();
+            }
+            //This is for the landing noise
+            if (this.playerStates.falling == true){
+                this.playerStates.falling = false;
+                this.playNote();
             }
             if(Phaser.Input.Keyboard.JustDown(cursors.up)){
                 this.playerStates.jumping = true;
-                this.jumpTimer.reset({ delay: 250, callback: this.onJump, callbackScope: this });
+                this.jumpTimer.reset({ delay: 250, callback: this.finishJump, callbackScope: this });
                 this.time.addEvent(this.jumpTimer);
                 this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
                 //PLAY JUMP SOUND EFFECT
             }
             if (Phaser.Input.Keyboard.JustDown(cursors.down)){
-                console.log(this.playerStates.platform);
                 if (this.playerStates.platform.properties.note != "rest"){
                     this.playerStates.platform.collideUp = false;
                     //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
@@ -175,13 +205,16 @@ class Platformer extends Phaser.Scene {
         }
         if (this.playerStates.jumping == true){
             if (cursors.up.isDown){
-                this.JUMP_VELOCITY -= 20 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
+                this.JUMP_VELOCITY -= 10 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             } else {
                 //This is in case the player wants to do a short jump;
                 this.playerStates.jumping = false;
                 this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
             }
+        }
+        if (my.sprite.player.body.velocity.y > 0){
+            this.playerStates.falling = true;
         }
     }
     resetCollision(){
@@ -201,9 +234,15 @@ class Platformer extends Phaser.Scene {
         my.sprite.player.x = this.spawnX;
         my.sprite.player.y = this.spawnY;
     }
-    onJump(){
-        console.log("on Jump called!");
+    finishJump(){
         this.playerStates.jumping = false;
         this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+    }
+    playNote(){
+        this.playerStates.stepSounds = true;
+        this.noteSounds[this.playerStates.platform.properties.note].play();
+        this.noteSounds[this.playerStates.platform.properties.note].on('complete', () => {
+            this.playerStates.stepSounds = false;
+        });
     }
 }

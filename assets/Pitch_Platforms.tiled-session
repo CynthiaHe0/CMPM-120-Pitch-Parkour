@@ -13,14 +13,14 @@
         },
         "Level1.tmj": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 235.33333333333331,
-                "y": 256.33333333333337
+                "x": 1974.6666666666665,
+                "y": 188.33333333333337
             }
         },
         "Level1.tmj#rainbow_notes": {
-            "scaleInDock": 1
+            "scaleInDock": 1.5
         },
         "Level1.tmj#tilemap_packed": {
             "scaleInDock": 1
@@ -34,6 +34,7 @@
             "scaleInEditor": 1
         }
     },
+    "frame.defaultDuration": 500,
     "last.exportedFilePath": "C:/Users/Cynthia/Desktop/CMPM-120/CMPM-120-Final-Game/assets",
     "last.imagePath": "C:/Users/Cynthia/Desktop/CMPM-120/CMPM-120-Final-Game/assets",
     "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
