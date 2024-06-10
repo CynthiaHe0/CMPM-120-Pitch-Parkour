@@ -120,8 +120,8 @@ class Platformer extends Phaser.Scene {
                 console.log("Onto the next area!");
                 //Start the next scene
             } else if (tile.index == 87){
-                my.sprite.enter.x = tile.x * 36;
-                my.sprite.enter.y = (tile.y+1) * 36;
+                my.sprite.enter.x = (tile.x) * 36 + 18;
+                my.sprite.enter.y = (tile.y - 1) * 36;
                 my.sprite.enter.visible = true;
                 this.playerStates.readSign = true;
                 this.playerStates.sign = tile;
@@ -136,28 +136,59 @@ class Platformer extends Phaser.Scene {
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.enterKey.on('down', ()=>{
             if (this.playerStates.readSign){
-                this.signContent[this.playerStates.sign.x];
+                console.log("reading sign!");
+                switch(this.playerStates.sign.x){
+                    case 3:
+                        this.moveControls();
+                        break;
+                    case 20:
+                        this.jumpControls();
+                        break;
+                    case 51:
+                        this.dropControls();
+                        break;
+                    case 75:
+                        this.puzzleSequence();
+                        break;
+                    default:
+                        console.log("Where the heck did you get this mystery sign?")
+                }
             }
         });
         my.sprite.enter = this.add.sprite(0, 0, "enter");
+        my.sprite.enter.setScale(0.8);
         my.sprite.enter.visible = false;
-        this.moveControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to move!");
+
+        this.moveControlsText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Use              to move!");
         this.moveControlsText.setOrigin(0.5);
         this.moveControlsText.visible = false;
-        my.sprite.left = this.add.sprite(game.config.width/2+20, game.config.height/5, "left");
+        this.moveControlsText.setScrollFactor(0);
+
+        my.sprite.left = this.add.sprite((game.config.width/2)-60, game.config.height/4, "left");
         my.sprite.left.visible = false;
-        my.sprite.right = this.add.sprite(game.config.width/2+20, game.config.height/5, "right");
+        my.sprite.left.setScrollFactor(0);
+
+        my.sprite.right = this.add.sprite(game.config.width/2   , game.config.height/4, "right");
         my.sprite.right.visible = false;
-        this.jumpControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to jump!");
+        my.sprite.right.setScrollFactor(0);
+
+        this.jumpControlsText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Use        to jump!");
         this.jumpControlsText.setOrigin(0.5);
         this.jumpControlsText.visible = false;
-        my.sprite.up = this.add.sprite(game.config.width/2+20, game.config.height/5, "up");
+        this.jumpControlsText.setScrollFactor(0);
+
+        my.sprite.up = this.add.sprite(game.config.width/2 - 30, game.config.height/4, "up");
         my.sprite.up.visible = false;
-        this.dropControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to drop through platforms!");
+        my.sprite.up.setScrollFactor(0);
+
+        this.dropControlsText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Use        to drop through platforms!");
         this.dropControlsText .setOrigin(0.5);
         this.dropControlsText.visible = false;
-        my.sprite.down = this.add.sprite(game.config.width/2+20, game.config.height/5, "down");
+        this.dropControlsText.setScrollFactor(0);
+
+        my.sprite.down = this.add.sprite(game.config.width/2 - 150, game.config.height/4, "down");
         my.sprite.down.visible = false;
+        my.sprite.down.setScrollFactor(0);
 
         //Puzzle layer handling
         this.physics.add.overlap(my.sprite.player, this.puzzleLayer, this.puzzleHandler, null, this);
