@@ -55,18 +55,18 @@ class Platformer extends Phaser.Scene {
                 tile.collideDown = false;
             }
         }
+        
+        this.puzzleLayer = this.map.createLayer("Puzzle", this.rainbowNotes, 0, 0);
+        this.puzzleLayer.setScale(SCALE);
+        this.puzzleLayer.setCollisionByProperty({
+            collides: true
+        });
+
+        
 
         //Set up checkpoints
         this.flags = this.map.createLayer("Flags", this.kennyTileset, 0, 0);
         this.flags.setScale(SCALE);
-        /*let checkpoints = this.flags.filterTiles((tile) =>{
-            if (tile.index != -1){
-                return true;
-            }
-            return false;
-        });
-        console.log(this.flags);
-        console.log(checkpoints);*/
         this.flags.setCollisionByProperty({
             collides : true
         });
@@ -111,8 +111,16 @@ class Platformer extends Phaser.Scene {
                 }
             } else if (tile.index == 11){
                 console.log("Onto the next area!");
+            } else if (tile.index == 87){
+                //console.log("Show sign prompt");
+                //console.log("Tile coords" + tile.x + ", " + tile.y);
+                // 3, 23 = left arrow and right arrow to move
+                // 20, 23 = Up Arrow to jump
+                // 51, 50 = Down arrow to fall through platforms
+                // 75, 20 = Music puzzle
             }
         });
+        this.physics.add.overlap(my.sprite.player, this.puzzleLayer, this.puzzleHandler, null, this);
         this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
 
 
@@ -247,5 +255,90 @@ class Platformer extends Phaser.Scene {
         this.noteSounds[this.playerStates.platform.properties.note].on('complete', () => {
             this.playerStates.stepSounds = false;
         });
+    }
+    puzzleHandler(player, tile){
+        //This object is a reference for me to 
+        let note2y = {
+            do : 24,
+            re : 22,
+            mi : 20,
+            fa : 18,
+            so : 16,
+            la : 14,
+            ti : 12,
+        };
+        if(tile.index != -1){
+            if (tile.x <= 85){
+                if (tile.y != note2y.do){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.do);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else if (tile.x < 90){
+                if (tile.y != note2y.fa){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.fa);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else if (tile.x < 95){
+                if (tile.y != note2y.la){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.la);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else if (tile.x < 100){
+                if (tile.y != note2y.mi){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.mi);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else if (tile.x < 105){
+                if (tile.y != note2y.so){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.so);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else if (tile.x < 110){
+                if (tile.y != note2y.ti){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.ti);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            } else {
+                if (tile.y != 10){
+                    tile.visible = false;
+                    this.map.removeTile(tile)
+                } else {
+                    let replace = this.groundLayer.getTileAt(78, note2y.do);
+                    this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
+                    let note = this.groundLayer.getTileAt(tile.x, tile.y);
+                    note.setCollision(true);
+                }
+            }
+        }
     }
 }

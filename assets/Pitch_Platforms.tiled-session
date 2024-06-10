@@ -13,14 +13,15 @@
         },
         "Level1.tmj": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 1893.3333333333333,
-                "y": 188.33333333333337
+                "x": 1672,
+                "y": 218.33333333333337
             }
         },
         "Level1.tmj#rainbow_notes": {
-            "scaleInDock": 1.5
+            "scaleInDock": 1.5,
+            "scaleInEditor": 1
         },
         "Level1.tmj#tilemap_packed": {
             "scaleInDock": 1
