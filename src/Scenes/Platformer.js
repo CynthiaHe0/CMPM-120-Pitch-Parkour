@@ -22,6 +22,8 @@ class Platformer extends Phaser.Scene {
             stepSounds: false,
             jumping: false,
             falling: false,
+            readSign: false,
+            sign: null,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -91,9 +93,12 @@ class Platformer extends Phaser.Scene {
         this.noteSounds.ti = this.sound.add("ti");
         this.noteSounds.high_do = this.sound.add("high do");
         this.noteSounds.rest = this.sound.add("rest");
+        
+        
 
 
         // Enable collision handling
+        // Ground Layer stuff
         this.physics.add.collider(my.sprite.player, this.groundLayer, (player, tile)=>{
             //This if statement resets the collision for the tiles
             if (this.playerStates.platform != null){
@@ -102,6 +107,8 @@ class Platformer extends Phaser.Scene {
             //This is for detecting what platform the player is on and eventually lets them fall through
             this.playerStates.platform = tile;
         });
+
+        //Flags and sign handling
         this.physics.add.overlap(my.sprite.player, this.flags, (player, tile) => {
             if (tile.index == 112 || tile.index == 132){
                 if (tile.x * 36 > this.spawnX){
@@ -111,15 +118,48 @@ class Platformer extends Phaser.Scene {
                 }
             } else if (tile.index == 11){
                 console.log("Onto the next area!");
+                //Start the next scene
             } else if (tile.index == 87){
-                //console.log("Show sign prompt");
-                //console.log("Tile coords" + tile.x + ", " + tile.y);
-                // 3, 23 = left arrow and right arrow to move
-                // 20, 23 = Up Arrow to jump
-                // 51, 50 = Down arrow to fall through platforms
-                // 75, 20 = Music puzzle
+                my.sprite.enter.x = tile.x * 36;
+                my.sprite.enter.y = (tile.y+1) * 36;
+                my.sprite.enter.visible = true;
+                this.playerStates.readSign = true;
+                this.playerStates.sign = tile;
             }
         });
+        this.signContent = {
+            3: this.moveControls,
+            20: this.jumpControls,
+            51: this.dropControls,
+            75: this.puzzleSequence,
+        }
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        this.enterKey.on('down', ()=>{
+            if (this.playerStates.readSign){
+                this.signContent[this.playerStates.sign.x];
+            }
+        });
+        my.sprite.enter = this.add.sprite(0, 0, "enter");
+        my.sprite.enter.visible = false;
+        this.moveControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to move!");
+        this.moveControlsText.setOrigin(0.5);
+        this.moveControlsText.visible = false;
+        my.sprite.left = this.add.sprite(game.config.width/2+20, game.config.height/5, "left");
+        my.sprite.left.visible = false;
+        my.sprite.right = this.add.sprite(game.config.width/2+20, game.config.height/5, "right");
+        my.sprite.right.visible = false;
+        this.jumpControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to jump!");
+        this.jumpControlsText.setOrigin(0.5);
+        this.jumpControlsText.visible = false;
+        my.sprite.up = this.add.sprite(game.config.width/2+20, game.config.height/5, "up");
+        my.sprite.up.visible = false;
+        this.dropControlsText = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "Use        to drop through platforms!");
+        this.dropControlsText .setOrigin(0.5);
+        this.dropControlsText.visible = false;
+        my.sprite.down = this.add.sprite(game.config.width/2+20, game.config.height/5, "down");
+        my.sprite.down.visible = false;
+
+        //Puzzle layer handling
         this.physics.add.overlap(my.sprite.player, this.puzzleLayer, this.puzzleHandler, null, this);
         this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
 
@@ -227,6 +267,19 @@ class Platformer extends Phaser.Scene {
         if (my.sprite.player.body.velocity.y > 0){
             this.playerStates.falling = true;
         }
+        if (this.playerStates.readSign == true){
+            if (Math.abs(my.sprite.player.body.x - (this.playerStates.sign.x * 36)) > 18 || Math.abs(my.sprite.player.body.y - (this.playerStates.sign.y * 36)) > 18){
+                this.playerStates.readSign = false;
+                my.sprite.enter.visible = false;
+                this.moveControlsText.visible = false;
+                this.dropControlsText.visible = false;
+                this.jumpControlsText.visible = false;
+                my.sprite.up.visible = false;
+                my.sprite.down.visible = false;
+                my.sprite.left.visible = false;
+                my.sprite.right.visible = false;
+            }
+        }
     }
     resetCollision(){
         let sameTiles = this.groundLayer.filterTiles((tile) => {
@@ -255,6 +308,22 @@ class Platformer extends Phaser.Scene {
         this.noteSounds[this.playerStates.platform.properties.note].on('complete', () => {
             this.playerStates.stepSounds = false;
         });
+    }
+    moveControls(){
+        this.moveControlsText.visible = true;
+        my.sprite.left.visible = true;
+        my.sprite.right.visible = true;
+    }
+    jumpControls(){
+        this.jumpControlsText.visible = true;
+        my.sprite.up.visible = true;
+    }
+    dropControls(){
+        this.dropControlsText.visible = true;
+        my.sprite.down.visible = true;
+    }
+    puzzleSequence(){
+        //ooooh boi this one a lotta work.
     }
     puzzleHandler(player, tile){
         //This object is a reference for me to 
