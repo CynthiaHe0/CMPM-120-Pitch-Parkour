@@ -216,7 +216,7 @@ class Platformer extends Phaser.Scene {
         }
         if (this.playerStates.jumping == true){
             if (cursors.up.isDown){
-                this.JUMP_VELOCITY -= 10 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
+                this.JUMP_VELOCITY -= 60 + 100*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             } else {
                 //This is in case the player wants to do a short jump;
@@ -269,11 +269,11 @@ class Platformer extends Phaser.Scene {
         };
         if(tile.index != -1){
             if (tile.x <= 85){
-                if (tile.y != note2y.do){
+                if (tile.y != note2y.re){
                     tile.visible = false;
                     this.map.removeTile(tile)
                 } else {
-                    let replace = this.groundLayer.getTileAt(78, note2y.do);
+                    let replace = this.groundLayer.getTileAt(78, note2y.re);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
                     note.setCollision(true);
