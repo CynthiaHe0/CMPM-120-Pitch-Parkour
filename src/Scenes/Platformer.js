@@ -262,7 +262,7 @@ class Platformer extends Phaser.Scene {
             }
             if(Phaser.Input.Keyboard.JustDown(cursors.up)){
                 this.playerStates.jumping = true;
-                this.jumpTimer.reset({ delay: 250, callback: this.finishJump, callbackScope: this });
+                this.jumpTimer.reset({ delay: 300, callback: this.finishJump, callbackScope: this });
                 this.time.addEvent(this.jumpTimer);
                 this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
                 //PLAY JUMP SOUND EFFECT
@@ -287,7 +287,7 @@ class Platformer extends Phaser.Scene {
         }
         if (this.playerStates.jumping == true){
             if (cursors.up.isDown){
-                this.JUMP_VELOCITY -= 60 + 100*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
+                this.JUMP_VELOCITY -= 20 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
                 my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
             } else {
                 //This is in case the player wants to do a short jump;
@@ -354,7 +354,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.down.visible = true;
     }
     puzzleSequence(){
-        //ooooh boi this one a lotta work.
+        console.log("Hi I have not been implemented yet!");
     }
     puzzleHandler(player, tile){
         //This object is a reference for me to 
