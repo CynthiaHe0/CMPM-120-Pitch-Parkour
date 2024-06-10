@@ -182,7 +182,7 @@ class Platformer extends Phaser.Scene {
         my.sprite.up.setScrollFactor(0);
 
         this.dropControlsText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Use        to drop through platforms!");
-        this.dropControlsText .setOrigin(0.5);
+        this.dropControlsText.setOrigin(0.5);
         this.dropControlsText.visible = false;
         this.dropControlsText.setScrollFactor(0);
 
@@ -193,7 +193,11 @@ class Platformer extends Phaser.Scene {
         //Puzzle layer handling
         this.physics.add.overlap(my.sprite.player, this.puzzleLayer, this.puzzleHandler, null, this);
         this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
-
+        this.puzzleSequenceText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Here's the secret: Re Fa La Mi So Ti Do'");
+        this.puzzleSequenceText.setOrigin(0.5);
+        this.puzzleSequenceText.visible = false;
+        this.puzzleSequenceText.setScrollFactor(0);
+        this.puzzleTune = this.sound.add("puzzle tune");
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -305,6 +309,7 @@ class Platformer extends Phaser.Scene {
                 this.moveControlsText.visible = false;
                 this.dropControlsText.visible = false;
                 this.jumpControlsText.visible = false;
+                this.puzzleSequenceText.visible = false;
                 my.sprite.up.visible = false;
                 my.sprite.down.visible = false;
                 my.sprite.left.visible = false;
@@ -354,7 +359,8 @@ class Platformer extends Phaser.Scene {
         my.sprite.down.visible = true;
     }
     puzzleSequence(){
-        console.log("Hi I have not been implemented yet!");
+        this.puzzleSequenceText.visible = true;
+        this.puzzleTune.play();
     }
     puzzleHandler(player, tile){
         //This object is a reference for me to 
