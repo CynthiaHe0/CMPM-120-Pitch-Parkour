@@ -9,7 +9,8 @@ class Platformer2 extends Phaser.Scene {
         this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.BASE_JUMP_VELOCITY = -100;
-        this.MAX_SPEED = 400;
+        this.MAX_Y_SPEED = 500;
+        this.MAX_X_SPEED = 400;
         this.score = 0;
         this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
@@ -45,7 +46,7 @@ class Platformer2 extends Phaser.Scene {
         my.sprite.player = this.physics.add.sprite(this.spawnX, this.spawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
         my.sprite.player.body.setSize(15, 15);
         my.sprite.player.setCollideWorldBounds(true);
-        my.sprite.player.body.setMaxSpeed(this.MAX_SPEED);
+        my.sprite.player.body.setMaxVelocity(this.MAX_X_SPEED, this.MAX_Y_SPEED);
         this.noteSounds = {};
         this.noteSounds.do = this.sound.add("do");
         this.noteSounds.re = this.sound.add("re");
