@@ -1,6 +1,6 @@
-class Platformer extends Phaser.Scene {
+class Platformer1 extends Phaser.Scene {
     constructor() {
-        super("platformerScene");
+        super("platformerScene1");
     }
     preload(){
         this.load.scenePlugin('AnimatedTiles', './lib/AnimatedTiles.js', 'animatedTiles', 'animatedTiles');
@@ -117,7 +117,9 @@ class Platformer extends Phaser.Scene {
                     //Play checkpoint sound
                 }
             } else if (tile.index == 11){
-                console.log("Onto the next area!");
+                //Play whoosh sound?
+                //Add some sort of transition
+                this.scene.start("platformerScene2");
                 //Start the next scene
             } else if (tile.index == 87){
                 my.sprite.enter.x = (tile.x) * 36 + 18;
@@ -220,6 +222,10 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
+
+        this.input.keyboard.on('keydown-A', () => {
+            this.scene.start("platformerScene2");
+        });
     }
 
     update() {

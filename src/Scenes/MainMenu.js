@@ -13,7 +13,7 @@ class MainMenu extends Phaser.Scene {
         this.start.setDisplaySize(300, 100);
         this.start.setInteractive();
         this.start.on('pointerdown', () => {
-            this.scene.start("platformerScene");
+            this.scene.start("platformerScene1");
         });
 
         this.credits = this.add.text(game.config.width/2, 2*game.config.height/3, 'Credits');
