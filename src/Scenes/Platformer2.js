@@ -9,7 +9,7 @@ class Platformer2 extends Phaser.Scene {
         this.DRAG = 2400;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1500;
         this.BASE_JUMP_VELOCITY = -100;
-        this.MAX_SPEED = 500;
+        this.MAX_SPEED = 400;
         this.score = 0;
         this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
@@ -114,12 +114,12 @@ class Platformer2 extends Phaser.Scene {
             //This is for the walking sounds
             if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0)){
                 //PLAY ASSOCIATED NOTE
-                //this.playNote();
+                this.playNote();
             }
             //This is for the landing noise
             if (this.playerStates.falling == true){
                 this.playerStates.falling = false;
-                //this.playNote();
+                this.playNote();
             }
             if(Phaser.Input.Keyboard.JustDown(cursors.up)){
                 this.playerStates.jumping = true;
