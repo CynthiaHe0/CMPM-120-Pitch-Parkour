@@ -25,6 +25,7 @@ class Platformer1 extends Phaser.Scene {
             falling: false,
             readSign: false,
             sign: null,
+            voidDeath : false,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -65,7 +66,7 @@ class Platformer1 extends Phaser.Scene {
         this.puzzleLayer.setCollisionByProperty({
             collides: true
         });
-
+        this.fakeTileSound = this.sound.add("fake tile");
         
 
         //Set up checkpoints
@@ -95,7 +96,7 @@ class Platformer1 extends Phaser.Scene {
         this.noteSounds.ti = this.sound.add("ti");
         this.noteSounds.high_do = this.sound.add("high do");
         this.noteSounds.rest = this.sound.add("rest");
-        
+        this.deathSound = this.sound.add("NOoo");
         
 
 
@@ -234,8 +235,14 @@ class Platformer1 extends Phaser.Scene {
     update() {
         //Check if the player fell off the map
         if (my.sprite.player.y >= this.map.heightInPixels*2){
-            //Play funny death thingy
-            this.respawn();
+            if (this.playerStates.voidDeath == false){
+                this.deathSound.play();
+                this.playerStates.voidDeath = true;
+            }
+            this.deathSound.on('complete', ()=>{
+                this.playerStates.voidDeath = false;
+                this.respawn();
+            });
         }
         if(cursors.left.isDown) {
             // TODO: have the player accelerate to the left
@@ -386,7 +393,8 @@ class Platformer1 extends Phaser.Scene {
             if (tile.x <= 85){
                 if (tile.y != note2y.re){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.re);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -396,7 +404,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.x < 90){
                 if (tile.y != note2y.fa){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.fa);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -406,7 +415,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.x < 95){
                 if (tile.y != note2y.la){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.la);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -416,7 +426,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.x < 100){
                 if (tile.y != note2y.mi){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.mi);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -426,7 +437,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.x < 105){
                 if (tile.y != note2y.so){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.so);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -436,7 +448,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.x < 110){
                 if (tile.y != note2y.ti){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.ti);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
@@ -446,7 +459,8 @@ class Platformer1 extends Phaser.Scene {
             } else {
                 if (tile.y != 10){
                     tile.visible = false;
-                    this.map.removeTile(tile)
+                    this.map.removeTile(tile);
+                    this.fakeTileSound.play();
                 } else {
                     let replace = this.groundLayer.getTileAt(78, note2y.do);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
