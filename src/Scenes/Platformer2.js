@@ -22,6 +22,7 @@ class Platformer2 extends Phaser.Scene {
             falling: false,
             readSign: false,
             sign: null,
+            bossMusic: false,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -41,6 +42,20 @@ class Platformer2 extends Phaser.Scene {
             collides: true
         });
         this.groundLayer.setScale(SCALE);
+        let fall_through = this.groundLayer.filterTiles((tile) => {
+            if (tile.collides == true){
+                return true;
+            }
+            return false;
+        });
+
+        for (let tile of fall_through){
+            if (tile.properties.note != "rest"){
+                tile.collideLeft = false;
+                tile.collideRight = false;
+                tile.collideDown = false;
+            }
+        }
 
         //Set up player
         my.sprite.player = this.physics.add.sprite(this.spawnX, this.spawnY, "platformer_characters", "tile_0000.png").setScale(SCALE)
@@ -64,6 +79,9 @@ class Platformer2 extends Phaser.Scene {
 
         this.physics.add.collider(my.sprite.player, this.groundLayer, (player, tile)=>{
             //This is for detecting what platform the player is on and eventually lets them fall through
+            if (this.playerStates.platform != null){
+                this.resetCollision();
+            }
             this.playerStates.platform = tile;
         });
 
@@ -171,5 +189,22 @@ class Platformer2 extends Phaser.Scene {
     finishJump(){
         this.playerStates.jumping = false;
         this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+    }
+    respawn(){
+        //this.physics.world.gravity.y = 1500;
+        this.resetCollision();
+        my.sprite.player.x = this.spawnX;
+        my.sprite.player.y = this.spawnY;
+    }
+    resetCollision(){
+        let sameTiles = this.groundLayer.filterTiles((tile) => {
+            if (tile.index == this.playerStates.platform.index){
+                return true;
+            }
+            return false;
+        });
+        for (let tile of sameTiles){
+            tile.collideUp = true;
+        }
     }
 }

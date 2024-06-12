@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Level1.tmj",
+    "activeFile": "Level2.tmj",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -15,8 +15,8 @@
             "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 1304,
-                "y": 218.33333333333337
+                "x": 1079.6666666666665,
+                "y": 225
             }
         },
         "Level1.tmj#rainbow_notes": {
@@ -30,8 +30,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 286,
-                "y": 110.5
+                "x": 643,
+                "y": 109.5
             }
         },
         "Level2.tmj#tile_sheet_128px_by_128px": {
@@ -58,13 +58,14 @@
     "map.tileWidth": 18,
     "map.width": 120,
     "openFiles": [
-        "Level1.tmj"
+        "Level1.tmj",
+        "Level2.tmj"
     ],
     "project": "Pitch_Platforms.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "Level2.tmj",
         "Level1.tmj",
+        "Level2.tmj",
         "rainbow_notes.tsx",
         "tilemap_packed.tsx"
     ],
