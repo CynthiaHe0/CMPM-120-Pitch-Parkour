@@ -8,6 +8,7 @@ class Load extends Phaser.Scene {
         this.load.bitmapFont('text', 'bitmapfont.png', 'bitmapfont.xml');
         // Load characters spritesheet
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
+        this.load.atlasXML("monsterParts", "sheet.png", "sheet.xml");
 
         // Load tilemap information
         this.load.tilemapTiledJSON("Level1", "Level1.tmj");
@@ -32,6 +33,7 @@ class Load extends Phaser.Scene {
         this.load.audio("high do", ["high_do.ogg"]);
         this.load.audio("rest", ["footstep_carpet_000.ogg"]);
         this.load.audio("puzzle tune", ["Note_Puzzle_Tune.ogg"]);
+        this.load.audio("boss music", ["Messing with chords.ogg"]);
 
     }
 

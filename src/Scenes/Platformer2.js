@@ -10,7 +10,7 @@ class Platformer2 extends Phaser.Scene {
         this.physics.world.gravity.y = 1500;
         this.BASE_JUMP_VELOCITY = -100;
         this.MAX_Y_SPEED = 500;
-        this.MAX_X_SPEED = 400;
+        this.MAX_X_SPEED = 300;
         this.score = 0;
         this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
@@ -27,6 +27,8 @@ class Platformer2 extends Phaser.Scene {
         this.flagCount = 0;
         this.SCALE = 1.5;
         this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
+        this.monsterBodyX = 300;
+        this.monsterBodyY = 300;
     }
     create(){
         //Set up level       
@@ -88,11 +90,33 @@ class Platformer2 extends Phaser.Scene {
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
         
+        // set up music monster
+        // MAKE THEM PATH FOLLOWERS
+        this.musicMonster = [];
+        this.musicMonster[0] = this.add.sprite(this.monsterBodyX, this.monsterBodyY, "monsterParts", "meteorGrey_big2.png");
+        this.musicMonster[1] = this.add.sprite(this.monsterBodyX + 90, this.monsterBodyY - 25, "monsterParts", "wingBlue_0.png");
+        this.musicMonster[1].setFlipX(true);
+        this.musicMonster[1].rotation += 1.5;
+        this.musicMonster[2] = this.add.sprite(this.monsterBodyX + 80, this.monsterBodyY, "monsterParts", "wingBlue_0.png");
+        this.musicMonster[2].setFlipX(true);
+        this.musicMonster[2].rotation += 2;
+        this.musicMonster[3] = this.add.sprite(this.monsterBodyX + 50, this.monsterBodyY + 25, "monsterParts", "wingBlue_0.png");
+        this.musicMonster[3].setFlipX(true);
+        this.musicMonster[3].rotation += 3;
+
+        for (let part of this.musicMonster){
+            part.setScrollFactor(0);
+            part.visible = false;
+        }
+
         //Have camera follow player
         this.cameras.main.setZoom(1.5);
         this.cameras.main.centerOn(my.sprite.player.x, my.sprite.player.y);
         this.cameras.main.startFollow(my.sprite.player, false, 0.5, 0.5);
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2);
+
+        this.bossMusic = this.sound.add("boss music", {volume:0.5});
+
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
@@ -177,6 +201,13 @@ class Platformer2 extends Phaser.Scene {
         }
         if (my.sprite.player.body.velocity.y > 0){
             this.playerStates.falling = true;
+        }
+        if (!(this.playerStates.bossMusic) && my.sprite.player.x > 18*18){
+            this.playerStates.bossMusic = true;
+            this.bossMusic.play();
+            for (let part of this.musicMonster){
+                part.visible = true;
+            }
         }
     }
     playNote(){

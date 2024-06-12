@@ -13,7 +13,7 @@ class Platformer1 extends Phaser.Scene {
         this.physics.world.gravity.y = 1500;
         this.BASE_JUMP_VELOCITY = -100;
         this.MAX_Y_SPEED = 500;
-        this.MAX_X_SPEED = 400;
+        this.MAX_X_SPEED = 300;
         this.score = 0;
         this.spawnX = game.config.width/10;
         this.spawnY = 5*game.config.height/6;
@@ -28,6 +28,7 @@ class Platformer1 extends Phaser.Scene {
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
+        this.physics.world.drawDebug = false;
     }
 
     create() {
@@ -120,7 +121,8 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.index == 11){
                 //Play whoosh sound?
                 //Add some sort of transition
-                this.scene.start("platformerScene2");
+                //If you can get chase sequence done, swap to platformerScene2
+                this.scene.start("endingScene");
                 //Start the next scene
             } else if (tile.index == 87){
                 my.sprite.enter.x = (tile.x) * 36 + 18;
