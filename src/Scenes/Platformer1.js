@@ -26,6 +26,7 @@ class Platformer1 extends Phaser.Scene {
             readSign: false,
             sign: null,
             voidDeath : false,
+            health: 3,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -111,13 +112,14 @@ class Platformer1 extends Phaser.Scene {
             this.playerStates.platform = tile;
         });
 
+        this.checkpointSound = this.sound.add("checkpoint");
         //Flags and sign handling
         this.physics.add.overlap(my.sprite.player, this.flags, (player, tile) => {
             if (tile.index == 112 || tile.index == 132){
                 if (tile.x * 36 > this.spawnX){
                     this.spawnX = tile.x * 36;
                     this.spawnY = 36 * (tile.index == 112 ? tile.y : tile.y-1);
-                    //Play checkpoint sound
+                    this.checkpointSound.play();
                 }
             } else if (tile.index == 11){
                 //Play whoosh sound?
@@ -143,17 +145,22 @@ class Platformer1 extends Phaser.Scene {
         this.enterKey.on('down', ()=>{
             if (this.playerStates.readSign){
                 console.log("reading sign!");
+                this.signTextBackground.visible = true;
                 switch(this.playerStates.sign.x){
                     case 3:
+                        this.signTextBackground.setScale(3);
                         this.moveControls();
                         break;
                     case 20:
+                        this.signTextBackground.setScale(3);
                         this.jumpControls();
                         break;
                     case 51:
+                        this.signTextBackground.setScale(5, 3);
                         this.dropControls();
                         break;
                     case 75:
+                        this.signTextBackground.setScale(5, 3);
                         this.puzzleSequence();
                         break;
                     default:
@@ -164,6 +171,12 @@ class Platformer1 extends Phaser.Scene {
         my.sprite.enter = this.add.sprite(0, 0, "enter");
         my.sprite.enter.setScale(0.8);
         my.sprite.enter.visible = false;
+
+        this.signTextBackground = this.add.sprite(game.config.width/2, game.config.height/4, "tip background");
+        this.signTextBackground.setOrigin(0.5);
+        this.signTextBackground.visible = false;
+        this.signTextBackground.setScrollFactor(0);
+        this.signTextBackground.setScale(3);
 
         this.moveControlsText = this.add.bitmapText(game.config.width/2, game.config.height/4, "text", "Use              to move!");
         this.moveControlsText.setOrigin(0.5);
@@ -322,6 +335,7 @@ class Platformer1 extends Phaser.Scene {
             if (Math.abs(my.sprite.player.body.x - (this.playerStates.sign.x * 36)) > 18 || Math.abs(my.sprite.player.body.y - (this.playerStates.sign.y * 36)) > 18){
                 this.playerStates.readSign = false;
                 my.sprite.enter.visible = false;
+                this.signTextBackground.visible = false;
                 this.moveControlsText.visible = false;
                 this.dropControlsText.visible = false;
                 this.jumpControlsText.visible = false;

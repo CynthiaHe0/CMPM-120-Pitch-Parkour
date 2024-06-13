@@ -13,10 +13,10 @@
         },
         "Level1.tmj": {
             "scale": 1.5,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 1079.6666666666665,
-                "y": 225
+                "x": 924.6666666666666,
+                "y": 218.33333333333337
             }
         },
         "Level1.tmj#rainbow_notes": {
@@ -30,8 +30,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 643,
-                "y": 109.5
+                "x": 215,
+                "y": 108.5
             }
         },
         "Level2.tmj#tile_sheet_128px_by_128px": {

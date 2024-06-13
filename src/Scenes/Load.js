@@ -24,6 +24,7 @@ class Load extends Phaser.Scene {
         this.load.image("left", "keyboard_arrow_left.png");
         this.load.image("right", "keyboard_arrow_right.png");
         this.load.image("enter", "keyboard_enter.png");
+        this.load.image("tip background", "PopUp_background.png");
 
         this.load.audio("do", ["do.ogg"]);
         this.load.audio("re", ["re.ogg"]);
@@ -38,7 +39,7 @@ class Load extends Phaser.Scene {
         this.load.audio("puzzle tune", ["Note_Puzzle_Tune.ogg"]);
         this.load.audio("fake tile", ["forceField_002.ogg"]);
         this.load.audio("boss music", ["Messing with chords.ogg"]);
-
+        this.load.audio("checkpoint", ["jingles_STEEL09.ogg"]);
     }
 
     create() {
