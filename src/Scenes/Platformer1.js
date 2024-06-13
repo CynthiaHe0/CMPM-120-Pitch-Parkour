@@ -125,7 +125,7 @@ class Platformer1 extends Phaser.Scene {
                 //Play whoosh sound?
                 //Add some sort of transition
                 //If you can get chase sequence done, swap to platformerScene2
-                this.scene.start("endingScene");
+                this.scene.start('endingScene', { health: this.playerStates.health});
                 //Start the next scene
             } else if (tile.index == 87){
                 my.sprite.enter.x = (tile.x) * 36 + 18;
@@ -248,13 +248,19 @@ class Platformer1 extends Phaser.Scene {
     update() {
         //Check if the player fell off the map
         if (my.sprite.player.y >= this.map.heightInPixels*2){
+            //This makes sure the game only removes 1 health at a time and plays the sound once
             if (this.playerStates.voidDeath == false){
+                this.playerStates.health--;
                 this.deathSound.play();
                 this.playerStates.voidDeath = true;
             }
             this.deathSound.on('complete', ()=>{
-                this.playerStates.voidDeath = false;
-                this.respawn();
+                if (this.playerStates.health > 0){
+                    this.playerStates.voidDeath = false;
+                    this.respawn();
+                } else {
+                    this.scene.start('endingScene', { health: this.playerStates.health});
+                }
             });
         }
         if(cursors.left.isDown) {
