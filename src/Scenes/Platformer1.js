@@ -396,6 +396,7 @@ class Platformer1 extends Phaser.Scene {
     finishJump(){
         this.playerStates.jumping = false;
         this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+        console.log(this.playerStates.platform);
     }
     playNote(){
         this.playerStates.stepSounds = true;
@@ -443,7 +444,8 @@ class Platformer1 extends Phaser.Scene {
             ti : 12,
         };
         if(tile.index != -1){
-            if (tile.x <= 85){
+            //console.log(tile);
+            if (tile.x <= 85 && tile.x > 80){
                 if (tile.y != note2y.re){
                     tile.visible = false;
                     this.map.removeTile(tile);
@@ -452,7 +454,8 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.re);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
+                    console.log(note);
                 }
             } else if (tile.x < 90){
                 if (tile.y != note2y.fa){
@@ -464,6 +467,7 @@ class Platformer1 extends Phaser.Scene {
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
                     note.setCollision(true);
+                    console.log(note);
                 }
             } else if (tile.x < 95){
                 if (tile.y != note2y.la){
