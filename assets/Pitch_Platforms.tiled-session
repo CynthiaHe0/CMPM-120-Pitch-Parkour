@@ -15,8 +15,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1468,
-                "y": 218.33333333333337
+                "x": 323.3333333333333,
+                "y": 106.33333333333331
             }
         },
         "Level1.tmj#rainbow_notes": {
@@ -64,7 +64,7 @@
         "Level2.tmj"
     ],
     "project": "Pitch_Platforms.tiled-project",
-    "property.type": "string",
+    "property.type": "bool",
     "recentFiles": [
         "Level1.tmj",
         "Level2.tmj",

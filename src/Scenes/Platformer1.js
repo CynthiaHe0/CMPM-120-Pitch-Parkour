@@ -27,6 +27,7 @@ class Platformer1 extends Phaser.Scene {
             sign: null,
             voidDeath : false,
             health: 3,
+            coinsCollected: 0,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -77,6 +78,11 @@ class Platformer1 extends Phaser.Scene {
             collides : true
         });
 
+        this.coins = this.map.createLayer("Coins", this.kennyTileset, 0, 0);
+        this.coins.setScale(SCALE);
+        this.coins.setCollisionByProperty({
+            collides : true
+        });
 
         //Scale up the world boundaries because we zoomed into the size of the objects
         this.physics.world.setBounds(0, 0, this.map.widthInPixels*2, this.map.heightInPixels*2 + 40);
@@ -101,19 +107,34 @@ class Platformer1 extends Phaser.Scene {
         
         //Health UI setup
         this.healthUI = [];
-        this.healthUI[0] = this.add.image(270, 150, "tilemap UI", 44);
+        this.healthUI[0] = this.add.image(330, 150, "tilemap UI", 170);
         this.healthUI[1] = this.add.image(330, 150, "tilemap UI", 171);
         this.healthUI[2] = this.add.image(330, 150, "tilemap UI", 172);
         this.healthUI[3] = this.add.image(330, 150, "tilemap UI", 173);
         this.healthUI[4] = this.add.image(330, 150, "tilemap UI", 174);
         this.healthUI[5] = this.add.image(330, 150, "tilemap UI", 175);
         this.healthUI[6] = this.add.image(330, 150, "tilemap UI", 176);
-        this.healthUI[7] = this.add.image(300, 150, "tilemap UI", 158);
+        this.healthUI[7] = this.add.image(330, 150, "tilemap UI", 177);
+        this.healthUI[8] = this.add.image(330, 150, "tilemap UI", 178);
+        this.healthUI[9] = this.add.image(330, 150, "tilemap UI", 179);
+        this.healthUI[10] = this.add.image(300, 150, "tilemap UI", 158);
+        this.healthUI[11] = this.add.image(270, 150, "tilemap UI", 44);
         for (let element of this.healthUI){
             element.setScrollFactor(0);
             element.setScale(2);
         }
         this.healthUpdate();
+
+        this.coinUI = [];
+        for (let i = 0; i < 10; i++){
+            this.coinUI[i] = this.add.image(1000, 150, "tilemap UI", 160 + i).setScale(2);
+            this.coinUI[i].setScrollFactor(0);
+        }
+        this.coinUI[10] = this.add.image(970, 150, "tilemap UI", 158).setScale(2);
+        this.coinUI[10].setScrollFactor(0);
+        this.coinUI[11] = this.add.image(940, 150, "tilemap UI", 151).setScale(2);
+        this.coinUI[11].setScrollFactor(0);
+        this.coinUpdate();
 
         // Enable collision handling
         // Ground Layer stuff
@@ -159,7 +180,6 @@ class Platformer1 extends Phaser.Scene {
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         this.enterKey.on('down', ()=>{
             if (this.playerStates.readSign){
-                console.log("reading sign!");
                 this.signTextBackground.visible = true;
                 switch(this.playerStates.sign.x){
                     case 3:
@@ -233,9 +253,12 @@ class Platformer1 extends Phaser.Scene {
         this.puzzleSequenceText.setScrollFactor(0);
         this.puzzleTune = this.sound.add("puzzle tune");
         this.yay = this.sound.add("yay");
+        
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
         
+        //Coin collection part
+        this.physics.add.overlap(my.sprite.player, this.coins, this.coinHandler, null, this);
         //Have camera follow player
         this.cameras.main.setZoom(1.5);
         this.cameras.main.centerOn(my.sprite.player.x, my.sprite.player.y);
@@ -245,7 +268,7 @@ class Platformer1 extends Phaser.Scene {
 
         
         //PUT THE INIT AFTER ALL LAYERS CREATED
-        //this.animatedTiles.init(this.map);
+        this.animatedTiles.init(this.map);
 
         
 
@@ -335,7 +358,6 @@ class Platformer1 extends Phaser.Scene {
                         //I am kinda cheating with my design because since it's based around notes, I made sure all the same notes
                         //are at the same height
                         let sameTiles = this.groundLayer.filterTiles((tile) => {
-                            //console.log(tile);
                             if (tile.y == this.playerStates.platform.y){
                                 return true;
                             }
@@ -397,7 +419,6 @@ class Platformer1 extends Phaser.Scene {
     finishJump(){
         this.playerStates.jumping = false;
         this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
-        console.log(this.playerStates.platform);
     }
     playNote(){
         this.playerStates.stepSounds = true;
@@ -424,13 +445,44 @@ class Platformer1 extends Phaser.Scene {
         this.puzzleTune.play();
     }
     healthUpdate(){
-        for (let i = 1; i < 7; i ++){
+        for (let i = 0; i < 10; i ++){
             let num = this.healthUI[i];
             if (i == this.playerStates.health){
                 num.visible = true;
             } else {
                 num.visible = false;
             }
+        }
+    }
+    coinUpdate(){
+        //console.log("I was called!");
+        for (let i = 0; i < 10; i++){
+            let num = this.coinUI[i];
+            if (i == this.playerStates.coinsCollected){
+                num.visible = true;
+            } else {
+                num.visible = false;
+            }
+        }
+    }
+    coinHandler(player, tile){
+        if (tile.index != -1){
+            console.log(tile);
+            if (tile.index == 152){
+                this.playerStates.coinsCollected++;
+                //play coin sound
+            } else if (tile.index == 68){
+                this.playerStates.coinsCollected += 5;
+                //play diamond sound
+            }
+            if (this.playerStates.coinsCollected > 9){
+                this.playerStates.coinsCollected -= 10;
+                this.playerStates.health++;
+                this.healthUpdate();
+                //Play health up sound
+            }
+            this.coinUpdate();
+            this.map.removeTile(tile);
         }
     }
     puzzleHandler(player, tile){
@@ -445,7 +497,6 @@ class Platformer1 extends Phaser.Scene {
             ti : 12,
         };
         if(tile.index != -1){
-            //console.log(tile);
             if (tile.x <= 85 && tile.x > 80){
                 if (tile.y != note2y.re){
                     tile.visible = false;
@@ -456,7 +507,6 @@ class Platformer1 extends Phaser.Scene {
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
                     note.setCollision(true, true, true, true, false);
-                    console.log(note);
                 }
             } else if (tile.x < 90){
                 if (tile.y != note2y.fa){
@@ -467,8 +517,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.fa);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
-                    console.log(note);
+                    note.setCollision(true, true, true, true, false);
                 }
             } else if (tile.x < 95){
                 if (tile.y != note2y.la){
@@ -479,7 +528,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.la);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
                 }
             } else if (tile.x < 100){
                 if (tile.y != note2y.mi){
@@ -490,7 +539,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.mi);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
                 }
             } else if (tile.x < 105){
                 if (tile.y != note2y.so){
@@ -501,7 +550,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.so);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
                 }
             } else if (tile.x < 110){
                 if (tile.y != note2y.ti){
@@ -512,7 +561,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.ti);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
                 }
             } else {
                 if (tile.y != 10){
@@ -523,7 +572,7 @@ class Platformer1 extends Phaser.Scene {
                     let replace = this.groundLayer.getTileAt(78, note2y.do);
                     this.groundLayer.putTileAt(replace, tile.x, tile.y, true);
                     let note = this.groundLayer.getTileAt(tile.x, tile.y);
-                    note.setCollision(true);
+                    note.setCollision(true, true, true, true, false);
                 }
             }
         }
