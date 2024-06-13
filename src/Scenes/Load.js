@@ -9,7 +9,7 @@ class Load extends Phaser.Scene {
         // Load characters spritesheet
         this.load.atlas("platformer_characters", "tilemap-characters-packed.png", "tilemap-characters-packed.json");
         this.load.atlasXML("monsterParts", "sheet.png", "sheet.xml");
-        
+
         this.load.spritesheet("tilemap UI", "tilemap_packed.png", {frameWidth: 18, frameHeight: 18});
         this.load.image("hat", "spike_top.png");
         this.load.image("pink puff", "particle_pink.png");
@@ -42,6 +42,7 @@ class Load extends Phaser.Scene {
         this.load.audio("fake tile", ["forceField_002.ogg"]);
         this.load.audio("boss music", ["Messing with chords.ogg"]);
         this.load.audio("checkpoint", ["jingles_STEEL09.ogg"]);
+        this.load.audio("yay", ["kids-saying-yay!-made-with-Voicemod.mp3"]);
     }
 
     create() {

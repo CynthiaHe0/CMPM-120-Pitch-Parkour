@@ -138,6 +138,7 @@ class Platformer1 extends Phaser.Scene {
             } else if (tile.index == 11){
                 //Play whoosh sound?
                 //Add some sort of transition
+                this.yay.play();
                 //If you can get chase sequence done, swap to platformerScene2
                 this.scene.start('endingScene', { health: this.playerStates.health});
                 //Start the next scene
@@ -231,7 +232,7 @@ class Platformer1 extends Phaser.Scene {
         this.puzzleSequenceText.visible = false;
         this.puzzleSequenceText.setScrollFactor(0);
         this.puzzleTune = this.sound.add("puzzle tune");
-
+        this.yay = this.sound.add("yay");
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
         
