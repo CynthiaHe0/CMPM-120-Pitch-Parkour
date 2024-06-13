@@ -99,7 +99,21 @@ class Platformer1 extends Phaser.Scene {
         this.noteSounds.rest = this.sound.add("rest");
         this.deathSound = this.sound.add("NOoo");
         
-
+        //Health UI setup
+        this.healthUI = [];
+        this.healthUI[0] = this.add.image(270, 150, "tilemap UI", 44);
+        this.healthUI[1] = this.add.image(330, 150, "tilemap UI", 171);
+        this.healthUI[2] = this.add.image(330, 150, "tilemap UI", 172);
+        this.healthUI[3] = this.add.image(330, 150, "tilemap UI", 173);
+        this.healthUI[4] = this.add.image(330, 150, "tilemap UI", 174);
+        this.healthUI[5] = this.add.image(330, 150, "tilemap UI", 175);
+        this.healthUI[6] = this.add.image(330, 150, "tilemap UI", 176);
+        this.healthUI[7] = this.add.image(300, 150, "tilemap UI", 158);
+        for (let element of this.healthUI){
+            element.setScrollFactor(0);
+            element.setScale(2);
+        }
+        this.healthUpdate();
 
         // Enable collision handling
         // Ground Layer stuff
@@ -251,6 +265,7 @@ class Platformer1 extends Phaser.Scene {
             //This makes sure the game only removes 1 health at a time and plays the sound once
             if (this.playerStates.voidDeath == false){
                 this.playerStates.health--;
+                this.healthUpdate();
                 this.deathSound.play();
                 this.playerStates.voidDeath = true;
             }
@@ -312,8 +327,10 @@ class Platformer1 extends Phaser.Scene {
                     //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
                     //I am kinda cheating with my design because since it's based around notes, I made sure all the same notes
                     //are at the same height
+                    console.log(this.playerStates.platform);
                     let sameTiles = this.groundLayer.filterTiles((tile) => {
-                        if (tile.index == this.playerStates.platform.index){
+                        //console.log(tile);
+                        if (tile.y == this.playerStates.platform.y){
                             return true;
                         }
                         return false;
@@ -355,7 +372,7 @@ class Platformer1 extends Phaser.Scene {
     }
     resetCollision(){
         let sameTiles = this.groundLayer.filterTiles((tile) => {
-            if (tile.index == this.playerStates.platform.index){
+            if (tile.y == this.playerStates.platform.y){
                 return true;
             }
             return false;
@@ -397,6 +414,17 @@ class Platformer1 extends Phaser.Scene {
     puzzleSequence(){
         this.puzzleSequenceText.visible = true;
         this.puzzleTune.play();
+    }
+    healthUpdate(){
+        for (let i = 1; i < 7; i ++){
+            let num = this.healthUI[i];
+            if (i == this.playerStates.health){
+                num.visible = true;
+                console.log("I am visible!");
+            } else {
+                num.visible = false;
+            }
+        }
     }
     puzzleHandler(player, tile){
         //This object is a reference for me to 

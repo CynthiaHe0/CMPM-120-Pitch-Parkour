@@ -21,7 +21,6 @@ class Ending extends Phaser.Scene{
         this.youLose = this.add.bitmapText(game.config.width/2, game.config.height/5, "text", "You Lose");
         this.youLose.setOrigin(0.5);
         this.x1 = this.add.sprite(game.config.width/2 + 10, game.config.height/2 + 20, "monsterParts", "laserRed11.png");
-        //this.x1.setScale(10);
         this.x2 = this.add.sprite(game.config.width/2 - 30, game.config.height/2 + 20, "monsterParts", "laserRed11.png");
 
         if (this.isDead){
