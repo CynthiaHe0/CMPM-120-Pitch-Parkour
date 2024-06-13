@@ -257,6 +257,11 @@ class Platformer1 extends Phaser.Scene {
         this.input.keyboard.on('keydown-A', () => {
             this.scene.start("platformerScene2");
         });
+
+        this.input.keyboard.on('keydown-W', () => {
+            this.playerStates.health++;
+            this.healthUpdate();
+        });
     }
 
     update() {
@@ -278,77 +283,78 @@ class Platformer1 extends Phaser.Scene {
                 }
             });
         }
-        if(cursors.left.isDown) {
-            // TODO: have the player accelerate to the left
-            //my.sprite.player.body.setVelocityX(-400);
-            my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
-            my.sprite.player.resetFlip();
-            my.sprite.player.anims.play('walk', true);
+        if (!(this.playerStates.voidDeath)){
+            if(cursors.left.isDown) {
+                // TODO: have the player accelerate to the left
+                //my.sprite.player.body.setVelocityX(-400);
+                my.sprite.player.body.setAccelerationX(-this.ACCELERATION);
+                my.sprite.player.resetFlip();
+                my.sprite.player.anims.play('walk', true);
 
-        } else if(cursors.right.isDown) {
-            // TODO: have the player accelerate to the right
-            //my.sprite.player.body.setVelocityX(400);
-            my.sprite.player.body.setAccelerationX(this.ACCELERATION);
-            my.sprite.player.setFlip(true, false);
-            my.sprite.player.anims.play('walk', true);
+            } else if(cursors.right.isDown) {
+                // TODO: have the player accelerate to the right
+                //my.sprite.player.body.setVelocityX(400);
+                my.sprite.player.body.setAccelerationX(this.ACCELERATION);
+                my.sprite.player.setFlip(true, false);
+                my.sprite.player.anims.play('walk', true);
 
-        } else {
-            // TODO: set acceleration to 0 and have DRAG take over
-            my.sprite.player.body.setAccelerationX(0);
-            my.sprite.player.body.setDragX(this.DRAG);
-            my.sprite.player.anims.play('idle');
-        }
+            } else {
+                // TODO: set acceleration to 0 and have DRAG take over
+                my.sprite.player.body.setAccelerationX(0);
+                my.sprite.player.body.setDragX(this.DRAG);
+                my.sprite.player.anims.play('idle');
+            }
 
-        // player jump
-        // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
-        if(!my.sprite.player.body.blocked.down) {
-            my.sprite.player.anims.play('jump');
-        } else {
-            //This is for the walking sounds
-            if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0)){
-                //PLAY ASSOCIATED NOTE
-                this.playNote();
-            }
-            //This is for the landing noise
-            if (this.playerStates.falling == true){
-                this.playerStates.falling = false;
-                this.playNote();
-            }
-            if(Phaser.Input.Keyboard.JustDown(cursors.up)){
-                this.playerStates.jumping = true;
-                this.jumpTimer.reset({ delay: 300, callback: this.finishJump, callbackScope: this });
-                this.time.addEvent(this.jumpTimer);
-                this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
-                //PLAY JUMP SOUND EFFECT
-            }
-            if (Phaser.Input.Keyboard.JustDown(cursors.down)){
-                if (this.playerStates.platform.properties.note != "rest"){
-                    this.playerStates.platform.collideUp = false;
-                    //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
-                    //I am kinda cheating with my design because since it's based around notes, I made sure all the same notes
-                    //are at the same height
-                    console.log(this.playerStates.platform);
-                    let sameTiles = this.groundLayer.filterTiles((tile) => {
-                        //console.log(tile);
-                        if (tile.y == this.playerStates.platform.y){
-                            return true;
+            // player jump
+            // note that we need body.blocked rather than body.touching b/c the former applies to tilemap tiles and the latter to the "ground"
+            if(!my.sprite.player.body.blocked.down) {
+                my.sprite.player.anims.play('jump');
+            } else {
+                //This is for the walking sounds
+                if (!(this.playerStates.stepSounds) && (my.sprite.player.body.velocity.x != 0)){
+                    //PLAY ASSOCIATED NOTE
+                    this.playNote();
+                }
+                //This is for the landing noise
+                if (this.playerStates.falling == true){
+                    this.playerStates.falling = false;
+                    this.playNote();
+                }
+                if(Phaser.Input.Keyboard.JustDown(cursors.up)){
+                    this.playerStates.jumping = true;
+                    this.jumpTimer.reset({ delay: 300, callback: this.finishJump, callbackScope: this });
+                    this.time.addEvent(this.jumpTimer);
+                    this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+                    //PLAY JUMP SOUND EFFECT
+                }
+                if (Phaser.Input.Keyboard.JustDown(cursors.down)){
+                    if (this.playerStates.platform.properties.note != "rest"){
+                        this.playerStates.platform.collideUp = false;
+                        //This is so if the player is stepping on 2 tiles at once, they will still be able to fall through
+                        //I am kinda cheating with my design because since it's based around notes, I made sure all the same notes
+                        //are at the same height
+                        let sameTiles = this.groundLayer.filterTiles((tile) => {
+                            //console.log(tile);
+                            if (tile.y == this.playerStates.platform.y){
+                                return true;
+                            }
+                            return false;
+                        });
+                        for (let tile of sameTiles){
+                            tile.collideUp = false;
                         }
-                        return false;
-                    });
-                    for (let tile of sameTiles){
-                        tile.collideUp = false;
                     }
                 }
             }
-        }
-        if (this.playerStates.jumping == true){
-            if (cursors.up.isDown){
-                this.JUMP_VELOCITY -= 20 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
-                my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
-            } else {
-                //This is in case the player wants to do a short jump;
-                this.playerStates.jumping = false;
-                this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+            if (this.playerStates.jumping == true){
+                if (cursors.up.isDown){
+                    this.JUMP_VELOCITY -= 20 + 20*(this.BASE_JUMP_VELOCITY/this.JUMP_VELOCITY);
+                    my.sprite.player.body.setVelocityY(this.JUMP_VELOCITY);
+                } else {
+                    //This is in case the player wants to do a short jump;
+                    this.playerStates.jumping = false;
+                    this.JUMP_VELOCITY = this.BASE_JUMP_VELOCITY;
+                }
             }
         }
         if (my.sprite.player.body.velocity.y > 0){
@@ -420,7 +426,6 @@ class Platformer1 extends Phaser.Scene {
             let num = this.healthUI[i];
             if (i == this.playerStates.health){
                 num.visible = true;
-                console.log("I am visible!");
             } else {
                 num.visible = false;
             }
