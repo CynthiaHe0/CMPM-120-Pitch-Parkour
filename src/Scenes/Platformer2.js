@@ -23,6 +23,7 @@ class Platformer2 extends Phaser.Scene {
             readSign: false,
             sign: null,
             bossMusic: false,
+            chaseStart: false,
         };
         this.flagCount = 0;
         this.SCALE = 1.5;
@@ -89,7 +90,6 @@ class Platformer2 extends Phaser.Scene {
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
-        
         // set up music monster
         // MAKE THEM PATH FOLLOWERS
         this.musicMonster = [];
@@ -103,6 +103,9 @@ class Platformer2 extends Phaser.Scene {
         this.musicMonster[3] = this.add.sprite(this.monsterBodyX + 50, this.monsterBodyY + 25, "monsterParts", "wingBlue_0.png");
         this.musicMonster[3].setFlipX(true);
         this.musicMonster[3].rotation += 3;
+        this.musicMonsterHead = this.add.sprite(this.game.config.width/2, 600, "platformer_characters", "tile_0025.png");
+        this.musicMonsterHead.setScale(8);
+        this.musicMonsterHead.visible = false;
 
         for (let part of this.musicMonster){
             part.setScrollFactor(0);
@@ -122,6 +125,9 @@ class Platformer2 extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
+
+        this.cutSceneTrigger = new Phaser.Events.EventEmitter();
+        this.cutSceneTrigger.on('start', this.startCutscene, this);
     }
     update(){
         //Check if the player fell off the map
@@ -202,12 +208,8 @@ class Platformer2 extends Phaser.Scene {
         if (my.sprite.player.body.velocity.y > 0){
             this.playerStates.falling = true;
         }
-        if (!(this.playerStates.bossMusic) && my.sprite.player.x > 18*18){
-            this.playerStates.bossMusic = true;
-            this.bossMusic.play();
-            for (let part of this.musicMonster){
-                part.visible = true;
-            }
+        if (my.sprite.player.x > 18*18 && this.playerStates.chaseStart == false){
+            this.cutSceneTrigger.emit('start');
         }
     }
     playNote(){
@@ -236,6 +238,43 @@ class Platformer2 extends Phaser.Scene {
         });
         for (let tile of sameTiles){
             tile.collideUp = true;
+        }
+    }
+    startCutscene(){
+        this.playerStates.chaseStart    = true;
+        for (let key in cursors){
+            console.log(cursors[key]);
+            cursors[key].enabled = false;
+            //This is to prevent the character from continously moving right if they were holding it before entering the trigger
+            cursors[key].isDown = false;
+        }
+        //Have boss jump up and smash floor (aka smth better than tween below)
+        this.musicMonsterHead.visible = true;
+        const bossJump = this.tweens.add({
+            targets: this.musicMonsterHead,
+            y: 500,
+            ease: "Power1",
+            duration: 1000,
+            yoyo: true,
+        });
+        //Launch the player up to first note
+        //my.sprite.player.body.setVelocityX(10000);
+        //my.sprite.player.body.setVelocityY(-1000000);
+        const playerLaunch = this.tweens.add({
+            targets: my.sprite.player,
+            x: 600,
+            y: 100,
+            duration: 1000,
+        });
+        //Start the music
+        this.playerStates.bossMusic = true;
+        this.bossMusic.play();
+        for (let part of this.musicMonster){
+            part.visible = true;
+        }
+        for (let key in cursors){
+            console.log(cursors[key]);
+            cursors[key].enabled = true;
         }
     }
 }
