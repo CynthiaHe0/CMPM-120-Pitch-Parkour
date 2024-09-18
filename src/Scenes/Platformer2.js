@@ -128,6 +128,9 @@ class Platformer2 extends Phaser.Scene {
 
         this.cutSceneTrigger = new Phaser.Events.EventEmitter();
         this.cutSceneTrigger.on('start', this.startCutscene, this);
+        this.cutSceneTrigger.on('end', this.endCutscene, this);
+        this.timedEvent = this.time.addEvent({delay: 1000, callback: this.destroyBlock, callbackScope:this, loop: true});
+        this.timedEvent.paused = true;
     }
     update(){
         //Check if the player fell off the map
@@ -211,6 +214,9 @@ class Platformer2 extends Phaser.Scene {
         if (my.sprite.player.x > 18*18 && this.playerStates.chaseStart == false){
             this.cutSceneTrigger.emit('start');
         }
+        if (my.sprite.player.x > 109*18 && this.playerStates.chaseStart == true){
+            this.cutSceneTrigger.emit('end');
+        }
     }
     playNote(){
         this.playerStates.stepSounds = true;
@@ -241,14 +247,13 @@ class Platformer2 extends Phaser.Scene {
         }
     }
     startCutscene(){
-        this.playerStates.chaseStart    = true;
+        this.playerStates.chaseStart = true;
         for (let key in cursors){
-            console.log(cursors[key]);
             cursors[key].enabled = false;
             //This is to prevent the character from continously moving right if they were holding it before entering the trigger
             cursors[key].isDown = false;
         }
-        //Have boss jump up and smash floor (aka smth better than tween below)
+        //Have boss jump up and smash floor (TODO: have tween better than tween below)
         this.musicMonsterHead.visible = true;
         const bossJump = this.tweens.add({
             targets: this.musicMonsterHead,
@@ -258,14 +263,17 @@ class Platformer2 extends Phaser.Scene {
             yoyo: true,
         });
         //Launch the player up to first note
-        //my.sprite.player.body.setVelocityX(10000);
-        //my.sprite.player.body.setVelocityY(-1000000);
         const playerLaunch = this.tweens.add({
             targets: my.sprite.player,
             x: 600,
             y: 100,
             duration: 1000,
         });
+        //playerLaunch.on('complete', function);
+        /* TODO
+        Need to delay the music start just a bit so it starts when the player lands on the first tile.
+        */
+        this.timedEvent.paused = false;
         //Start the music
         this.playerStates.bossMusic = true;
         this.bossMusic.play();
@@ -273,8 +281,27 @@ class Platformer2 extends Phaser.Scene {
             part.visible = true;
         }
         for (let key in cursors){
-            console.log(cursors[key]);
             cursors[key].enabled = true;
+        }
+    }
+    endCutscene(){
+        //TODO Have the monster disappear or smth
+        this.timedEvent.paused = true;
+    }
+    destroyBlock(){
+        //TODO: add fancy destroy animation
+        if(this.playerStates.chaseStart){
+            let destroy = this.groundLayer.filterTiles((tile) => {
+                if (tile.x == this.flagCount){
+                    return true;
+                }
+                return false;
+            });
+            for (let tile of destroy){
+                tile.visible = false;
+                this.map.removeTile(tile);
+            }
+            this.flagCount++;
         }
     }
 }
