@@ -29,7 +29,7 @@ class Platformer2 extends Phaser.Scene {
         this.SCALE = 1.5;
         this.jumpTimer = this.time.addEvent({ delay: 250, callback: this.finishJump, callbackScope: this });
         this.monsterBodyX = 300;
-        this.monsterBodyY = 300;
+        this.monsterBodyY = 200;
     }
     create(){
         //Set up level       
@@ -214,7 +214,7 @@ class Platformer2 extends Phaser.Scene {
         if (my.sprite.player.x > 18*18 && this.playerStates.chaseStart == false){
             this.cutSceneTrigger.emit('start');
         }
-        if (my.sprite.player.x > 109*18 && this.playerStates.chaseStart == true){
+        if (my.sprite.player.x > 109*2*18 && this.playerStates.chaseStart == true){
             this.cutSceneTrigger.emit('end');
         }
     }
@@ -269,6 +269,14 @@ class Platformer2 extends Phaser.Scene {
             y: 100,
             duration: 1000,
         });
+        this.moveClaw = this.tweens.add({
+            targets: this.musicMonster,
+            y: 500,
+            duration: 1000,
+            yoyo: true,
+            loop: -1,
+            ease: 'Sine.inOut'
+        });
         //playerLaunch.on('complete', function);
         /* TODO
         Need to delay the music start just a bit so it starts when the player lands on the first tile.
@@ -287,6 +295,10 @@ class Platformer2 extends Phaser.Scene {
     endCutscene(){
         //TODO Have the monster disappear or smth
         this.timedEvent.paused = true;
+        this.moveClaw.destroy();
+        for (let part of this.musicMonster){
+            part.visible = false;
+        }
     }
     destroyBlock(){
         //TODO: add fancy destroy animation
